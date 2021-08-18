@@ -3,7 +3,7 @@ import Layout from "../../components/layout";
 import {GetStaticPaths, GetStaticProps} from "next";
 import Head from "next/head";
 import {getAllGameUuids, getGame} from '../../utils/db';
-import {IGame} from '../interfaces';
+import {IGame} from '../../utils/interfaces';
 
 interface Props {
     gameData: IGame;

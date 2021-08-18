@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import styles from './index.module.scss';
 import Layout from '../components/layout';
-import {IGame} from './interfaces';
+import {IGame} from '../utils/interfaces';
 import {GetStaticProps} from 'next';
 import {getRandomGames} from '../utils/db';
 import {Button} from '@material-ui/core';
@@ -34,7 +34,7 @@ const Home: React.FC<IProps> = ({randomGames}) => {
 
                 <div className={styles.grid}>
                     {randomGames.map(game => (
-                        <Link key={game.id} href={`/game/${game.uuid}`}>
+                        <Link key={game.id} href={`/game/${game.uuid}`} passHref>
                             <a className={styles.card}>
                                 <h2>{game.name}</h2>
                             </a>
