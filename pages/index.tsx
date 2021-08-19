@@ -52,6 +52,7 @@ export const getStaticProps: GetStaticProps<IProps> = async () => {
         props: {
             randomGames: games,
         },
+        revalidate: 15,
     };
 };
 
