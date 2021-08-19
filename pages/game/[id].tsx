@@ -7,9 +7,12 @@ import { IGame } from '../../utils/interfaces';
 import { Button, Typography } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import utilStyles from '../../styles/utilStyles.module.scss';
+import styles from './index.module.scss';
+import Words from '../../components/words';
+import ErrorPage from 'next/error';
 
 interface Props {
-    gameData: IGame;
+    gameData: IGame | null;
 }
 
 const deleteGame = async ( uuid: string ) => {
@@ -32,6 +35,8 @@ const Game: React.FC<Props> = ( { gameData } ) => {
 
     if (router.isFallback) {
         return <div>Building Game...</div>
+    } else if (gameData === null) {
+        return <ErrorPage statusCode={404}/>;
     }
 
     const handleDelete = () => {
@@ -59,12 +64,14 @@ const Game: React.FC<Props> = ( { gameData } ) => {
             <Head>
                 <title>{gameData.name} - Team Bingo</title>
             </Head>
-            <article>
-                <h1></h1>
-                <div>
+            <div className={styles.main}>
+                <div className={styles.details}>
                     <p>ID: {gameData.id}</p>
                 </div>
-            </article>
+                <div className={styles.words}>
+                    <Words gameUuid={gameData.uuid} />
+                </div>
+            </div>
         </Layout>
     );
 };
@@ -85,7 +92,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ( { par
     if ( !params ) {
         return {
             props: {
-                gameData: {},
+                gameData: null,
             },
         };
     }
