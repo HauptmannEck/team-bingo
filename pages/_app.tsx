@@ -1,19 +1,20 @@
 import React from 'react';
-import type {AppProps} from 'next/app';
+import type { AppProps } from 'next/app';
 import '../styles/globals.scss';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Head from 'next/head';
+import { SWRConfig } from 'swr';
 
 export const siteTitle = 'Team Bingo';
 
-const App: React.FC<AppProps> = ({Component, pageProps}) => {
-    React.useEffect(() => {
+const App: React.FC<AppProps> = ( { Component, pageProps } ) => {
+    React.useEffect( () => {
         // Remove the server-side injected CSS.
-        const jssStyles = document.querySelector('#jss-server-side');
-        if (jssStyles) {
-            jssStyles.parentElement!.removeChild(jssStyles);
+        const jssStyles = document.querySelector( '#jss-server-side' );
+        if ( jssStyles ) {
+            jssStyles.parentElement!.removeChild( jssStyles );
         }
-    }, []);
+    }, [] );
     return (
         <>
             <Head>
@@ -26,7 +27,14 @@ const App: React.FC<AppProps> = ({Component, pageProps}) => {
                 <meta name="twitter:card" content="summary_large_image"/>
             </Head>
             <CssBaseline/>
-            <Component {...pageProps}/>
+            <SWRConfig
+                value={{
+                    refreshInterval: 10000,
+                    fetcher: ( resource, init ) => fetch( resource, init ).then( res => res.json() ),
+                }}
+            >
+                <Component {...pageProps}/>
+            </SWRConfig>
         </>
     );
 };

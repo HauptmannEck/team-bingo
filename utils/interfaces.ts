@@ -3,3 +3,9 @@ export interface IGame {
     uuid: string;
     name: string;
 }
+
+export interface IWord {
+    id: number;
+    uuid: string;
+    text: string;
+}
