@@ -5,7 +5,7 @@ const conn = new PSDB(process.env.NODE_ENV === 'development' ? 'develop' : 'main
 
 export const getRandomGames = async () => {
   try {
-    const [getRows] = await conn.query('select id, uuid, name from games order by rand() limit 6', undefined);
+    const [getRows] = await conn.query('select id, uuid, name from games order by rand()', undefined); // limit 6
     return getRows.map((item: any) => ({...item})) ?? [];
   } catch (e) {
     return [];
@@ -29,6 +29,15 @@ export const createGame = async (name: string, adminCode: string): Promise<strin
     return row[0].uuid;
   } catch (e) {
     return null;
+  }
+};
+
+export const deleteGame = async (uuid: string): Promise<boolean> => {
+  try {
+    await conn.query(`delete from games where uuid='${uuid}'`, undefined);
+    return true;
+  } catch (e) {
+    return false;
   }
 };
 
