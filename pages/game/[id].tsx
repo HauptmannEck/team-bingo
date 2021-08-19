@@ -30,6 +30,10 @@ const deleteGame = async ( uuid: string ) => {
 const Game: React.FC<Props> = ( { gameData } ) => {
     const router = useRouter();
 
+    if (router.isFallback) {
+        return <div>Building Game...</div>
+    }
+
     const handleDelete = () => {
         deleteGame( gameData.uuid )
             .then( () => router.push( '/' ) );
@@ -73,7 +77,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
                 id: item,
             },
         }) ),
-        fallback: false,
+        fallback: true,
     };
 };
 
@@ -90,6 +94,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ( { par
         props: {
             gameData,
         },
+        revalidate: 15,
     };
 };
 
