@@ -59,6 +59,8 @@ export const createGameWord = async (uuid: string, text: string): Promise<boolea
 
 export const deleteGame = async (uuid: string): Promise<boolean> => {
     try {
+        await conn.query('delete from boards where game_uuid=?', [uuid]);
+        await conn.query('delete from game_words where uuid=?', [uuid]);
         await conn.query('delete from games where uuid=?', [uuid]);
         return true;
     } catch (e) {
