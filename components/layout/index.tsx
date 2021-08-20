@@ -1,5 +1,11 @@
 import React from 'react';
-import {AppBar, Container, createTheme, IconButton, ThemeProvider, Toolbar, useMediaQuery} from '@material-ui/core';
+import {
+    AppBar,
+    Container,
+    IconButton,
+    Link,
+    Toolbar,
+} from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
 import {useRouter} from 'next/router';
 import styles from './index.module.scss';
@@ -7,18 +13,6 @@ import styles from './index.module.scss';
 interface Props {
     toolbar?: JSX.Element;
 }
-
-const darkTheme = createTheme({
-    palette: {
-        type: 'dark',
-    },
-});
-
-const lightTheme = createTheme({
-    palette: {
-        type: 'light',
-    },
-});
 
 const Layout: React.FC<Props> = ({children, toolbar}) => {
     const router = useRouter();
@@ -37,7 +31,7 @@ const Layout: React.FC<Props> = ({children, toolbar}) => {
                 <main className={styles.main}>
                     {children}
                 </main>
-                <footer>From Happy Bandit</footer>
+                <footer>From <Link href="https://github.com/HauptmannEck/team-bingo">Happy Bandit</Link> {(new Date()).getFullYear()}</footer>
             </Container>
     );
 };
