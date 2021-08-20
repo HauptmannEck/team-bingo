@@ -19,9 +19,9 @@ interface Props {
 
 const addWord = async ( uuid: string, word: string ) => {
     const res = await fetch( `/api/game/${uuid}/words`, {
-        body: JSON.stringify({
+        body: JSON.stringify( {
             text: word,
-        }),
+        } ),
         headers: {
             'Content-Type': 'application/json',
         },
@@ -37,21 +37,21 @@ const addWord = async ( uuid: string, word: string ) => {
 
 const Words: React.FC<Props> = ( { gameUuid } ) => {
     const { data, error, mutate } = useSWR<IWord[]>( `/api/game/${gameUuid}/words` );
-    const [newWord, setNewWord] = useState('');
+    const [newWord, setNewWord] = useState( '' );
 
     if ( error ) return <div>failed to load</div>;
     if ( !data ) return <div>loading...</div>;
 
     const handleAdd = () => {
-        addWord(gameUuid, newWord)
-            .then(() => mutate());
-        setNewWord('');
+        addWord( gameUuid, newWord )
+            .then( () => mutate() );
+        setNewWord( '' );
     };
 
     return (
         <>
             <Typography variant="h4">
-                Words ({data?.length ?? 0}/24 min)
+                Words ({data?.length ?? 0})<Typography variant="subtitle1" display="inline">24 min</Typography>
             </Typography>
             <div className={styles.list}>
                 <List>
@@ -62,24 +62,27 @@ const Words: React.FC<Props> = ( { gameUuid } ) => {
                     ) )}
                 </List>
             </div>
-            <FormControl>
-                <InputLabel htmlFor="add-word">New Word</InputLabel>
-                <Input
-                    id="add-word"
-                    value={newWord}
-                    onChange={(event) => setNewWord(event.target.value)}
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton
-                                disabled={newWord.trim().length === 0}
-                                onClick={handleAdd}
-                            >
-                                <AddIcon/>
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                />
-            </FormControl>
+            <form style={{width: '100%'}} onSubmit={handleAdd}>
+                <FormControl fullWidth>
+                    <InputLabel htmlFor="add-word">New Word</InputLabel>
+                    <Input
+                        id="add-word"
+                        value={newWord}
+                        onChange={( event ) => setNewWord( event.target.value )}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    disabled={newWord.trim().length === 0}
+                                    onClick={handleAdd}
+                                    type="submit"
+                                >
+                                    <AddIcon/>
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    />
+                </FormControl>
+            </form>
         </>
     );
 };

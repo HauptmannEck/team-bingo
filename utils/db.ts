@@ -125,3 +125,25 @@ export const getBoard = async (uuid: string, id: number): Promise<IBoard | null>
         return null;
     }
 };
+
+export const clearGamesBoards = async (): Promise<void> => {
+    try {
+        const [oldBoards] = await conn.query('select id from boards where updated_at < now() - interval 30 DAY', []);
+        const [oldGames] = await conn.query('select uuid from games where updated_at < now() - interval 30 DAY', []);
+        if (oldBoards.length > 0) {
+            await conn.query('delete from boards where id in (?)', [oldBoards.map(( board: { id: any; }) => board.id)]);
+        }
+        if (oldGames.length > 0){
+            for(const game of oldGames) {
+                const [boards] = await conn.query('select COUNT(*) from boards where game_uuid=?', [game.uuid]);
+                if(boards.length === 1 && boards[0]['COUNT(*)'] === 0){
+                    await conn.query('delete from game_words where uuid=?', [game.uuid]);
+                    await conn.query('delete from games where uuid=?', [game.uuid]);
+                }
+            }
+        }
+    } catch (e) {
+        console.error(e);
+        return;
+    }
+};
