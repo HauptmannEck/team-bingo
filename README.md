@@ -1,8 +1,25 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Team Bingo
+
+Ever get stuck in a long or frequent meeting and noticed that the same buzzwords or phrases are used a lot? 
+Help yourself focus and complete with your colleges with a Bingo game built by your team, for your team.
+
+##Features
+* Select your own list of words (min 24).
+* Game and Boards are disposable and will live unused for up to 30 days.
+* If you want to hold onto a board, a link can be emailed to you.
+* Marked boxed persist for a board.
+
+## Technology
+All technologies were chosen for ease of use and scale of free tier.
+* [Next.js](https://nextjs.org/) For Foundation of React and Serverless API logic.
+* [Vercel](https://vercel.com/) Hosts Next.js projects easily and with a free tier.
+* [PlanetScale](https://planetscale.com/) Distributed MySQL service.
+* [EasyCron](https://www.easycron.com/) Simple and Free CRON job triggers (used to help with DB cleaning).
+* [SendGrid](https://sendgrid.com/) Free email sending with simple API.
 
 ## Getting Started
 
-First, run the development server:
+Run the development server:
 
 ```bash
 npm run dev
@@ -12,23 +29,14 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Will need an `.env.local` file or Env Variables to connect to PlanetScale and SendGrid services. 
+```
+PLANETSCALE_DB_HOST=<>
+PLANETSCALE_DB_PASSWORD=<>
+PLANETSCALE_DB_USERNAME=<>
+PLANETSCALE_DB=<>
+PLANETSCALE_ORG=<>
+PLANETSCALE_TOKEN=<>
+PLANETSCALE_TOKEN_NAME=<>
+SENDGRID_API_KEY=<>
+```
