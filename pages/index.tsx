@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import styles from './index.module.scss';
 import Layout from '../components/layout';
-import {IGame} from '../utils/interfaces';
+import type {IGame} from '../utils/interfaces';
 import {GetStaticProps} from 'next';
 import {getRandomGames} from '../utils/db';
 import {Button} from '@material-ui/core';

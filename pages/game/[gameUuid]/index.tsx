@@ -3,14 +3,15 @@ import Layout from '../../../components/layout';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import { getAllGameUuids, getGame } from '../../../utils/db';
-import { IGame } from '../../../utils/interfaces';
-import { Button, Typography } from '@material-ui/core';
+import type { IGame } from '../../../utils/interfaces';
+import { Typography } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import utilStyles from '../../../styles/utilStyles.module.scss';
 import styles from '../index.module.scss';
 import Words from '../../../components/words';
 import ErrorPage from 'next/error';
 import EditGame from '../../../components/editGame';
+import CreateBoard from '../../../components/createBoard';
 
 interface Props {
     gameData: IGame | null;
@@ -42,6 +43,7 @@ const Game: React.FC<Props> = ( { gameData } ) => {
             <div className={styles.main}>
                 <div className={styles.details}>
                     <p>{gameData.desc ?? ''}</p>
+                    <CreateBoard game={gameData}/>
                 </div>
                 <div className={styles.words}>
                     <Words gameUuid={gameData.uuid} />

@@ -1,18 +1,9 @@
 import React, {useState} from 'react';
 import {
     Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-    FormControl,
-    IconButton,
-    Input,
-    InputAdornment,
-    InputLabel,
-    List,
-    ListItem, TextField, Typography,
+    TextField,
 } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
-import useSWR from 'swr';
-import styles from './index.module.scss';
-import {IGame, IWord} from '../../utils/interfaces';
+import type {IGame} from '../../utils/interfaces';
 import {useRouter} from 'next/router';
 
 interface Props {

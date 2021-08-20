@@ -24,3 +24,8 @@ export interface ICell {
     word: string;
     selected: boolean;
 }
+
+export interface IDBCell {
+    id: number;
+    selected: boolean;
+}

@@ -1,41 +1,43 @@
 import React from 'react';
 import Layout from '../../../../components/layout';
-import {GetStaticPaths, GetStaticProps} from 'next';
 import Head from 'next/head';
-import {getAllGameUuids, getGame} from '../../../../utils/db';
-import {IBoard, ICell, IGame, IWord} from '../../../../utils/interfaces';
-import {Button, Typography} from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
-import {useRouter} from 'next/router';
+import type { IBoard, ICell } from '../../../../utils/interfaces';
+import { Typography } from '@material-ui/core';
+import { useRouter } from 'next/router';
 import utilStyles from '../../../../styles/utilStyles.module.scss';
 import styles from '../board.module.scss';
-import Words from '../../../../components/words';
-import ErrorPage from 'next/error';
-import EditGame from '../../../../components/editGame';
 import useSWR from 'swr';
+import ErrorPage from 'next/error';
 
 interface Props {
     gameUuid: string;
     boardId: string;
 }
 
-const testBoard: IBoard = {
-    name: 'Test Board',
-    id: 0,
-    gameUuid: '',
-    cells: [{
-        wordId: 0,
-        word: 'first',
-        selected: false,
-    }, {
-        wordId: 0,
-        word: 'second',
-        selected: true,
-    }],
+const editBoard = async ( uuid: string, id: number, name: string, cells: ICell[] ) => {
+    const res = await fetch( `/api/game/${uuid}/board/${id}`, {
+        body: JSON.stringify( {
+            name,
+            cells: cells.map( cell => ({
+                id: cell.wordId,
+                selected: cell.selected,
+            }) ),
+        } ),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        method: 'PUT',
+    } );
+
+    if ( res.status == 204 ) {
+        return;
+    } else {
+        throw Error( await res.text() );
+    }
 };
 
 interface ICellProps extends Partial<ICell> {
-    onClick: (selected: boolean) => void;
+    onClick?: () => void;
 }
 
 const SelectedSVG = () => (
@@ -45,41 +47,60 @@ const SelectedSVG = () => (
     </svg>
 );
 
-const Cell: React.FC<ICellProps> = ({word = '', selected = false}) => (
-    <div className={`${styles.cell} ${selected ? styles.active : ''}`}>
+const Cell: React.FC<ICellProps> = ( { wordId, word = '', selected = false, onClick } ) => (
+    <div className={`${styles.cell} ${selected ? styles.active : ''} ${wordId === -1 ? styles.free : ''}`} onClick={onClick}>
         <Typography variant="h6" className={styles.text}>{word}</Typography>
         <div className={styles.check}><SelectedSVG/></div>
     </div>
 );
 
-const Game: React.FC<Props> = () => {
+const Board: React.FC<Props> = () => {
     const router = useRouter();
-    const {gameUuid, boardId} = router.query;
-    //const { data, error } = useSWR<IWord[]>( `/api/game/${gameUuid}/${boardId}` );
-    const data = testBoard;
-    if (router.isFallback) {
-        return <div>Building Board...</div>;
-    }
+    const { gameUuid, boardId } = router.query;
+    const { data, error, mutate } = useSWR<IBoard>( `/api/game/${gameUuid}/board/${boardId}` );
 
-    const getCells = () => {
+    if ( error ) return <ErrorPage statusCode={404}/>;
+
+    const handleClick = ( selected: boolean, id?: number ) => {
+        if ( !data || !id || id < 0 ) {
+            return;
+        }
+        const newCells = data.cells.map( cell => {
+            const newCell = { ...cell };
+            if ( cell.wordId === id ) {
+                newCell.selected = !newCell.selected;
+            }
+            return newCell;
+        } );
+        editBoard( gameUuid as string, parseInt( boardId as string ), data?.name, newCells )
+            .then( () => mutate( {
+                id: data?.id,
+                name: data?.name,
+                gameUuid: data?.gameUuid,
+                cells: newCells,
+            }, true ) )
+            .then( res => console.log( res ) );
+    };
+
+    const getCells = ( dataCells: ICell[] = [] ) => {
         const cells: JSX.Element[] = [];
-        for (let i = 0; i <= 24; i++) {
-            let cellData: ICell;
-            if (i < 12) {
-                cellData = data.cells[i];
-            } else if (i === 12) {
+        for ( let i = 0; i <= 24; i++ ) {
+            let cellData: ICell | undefined;
+            if ( i < 12 ) {
+                cellData = dataCells[i];
+            } else if ( i === 12 ) {
                 cellData = {
                     wordId: -1,
                     word: 'Free Space',
                     selected: true,
                 };
             } else {
-                cellData = data.cells[i - 1];
+                cellData = dataCells[i - 1];
             }
             cells.push(
                 <Cell
                     key={i}
-                    onClick={() => null}
+                    onClick={cellData?.wordId >= 0 ? () => handleClick( !cellData?.selected, cellData?.wordId ) : undefined}
                     wordId={cellData?.wordId}
                     word={cellData?.word}
                     selected={cellData?.selected}
@@ -94,19 +115,19 @@ const Game: React.FC<Props> = () => {
             toolbar={(
                 <>
                     <Typography variant="h6" color="inherit" className={utilStyles.appBarTitle}>
-                        {data.name}
+                        {data?.name ?? ''}
                     </Typography>
                 </>
             )}
         >
             <Head>
-                <title>{data.name} - Team Bingo</title>
+                <title>{data?.name ?? ''} - Team Bingo</title>
             </Head>
             <div className={styles.board}>
-                {getCells()}
+                {getCells( data?.cells )}
             </div>
         </Layout>
     );
 };
 
-export default Game;
+export default Board;

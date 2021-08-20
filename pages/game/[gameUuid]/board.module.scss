@@ -27,9 +27,15 @@
     z-index: -1;
   }
 
+  &.free {
+    .check {
+      color: gray;
+    }
+  }
+
   &.active {
     .check {
-      display: block;
+      display: grid;
     }
   }
 }

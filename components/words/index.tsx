@@ -11,7 +11,7 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import useSWR from 'swr';
 import styles from './index.module.scss';
-import { IWord } from '../../utils/interfaces';
+import type { IWord } from '../../utils/interfaces';
 
 interface Props {
     gameUuid: string;
@@ -36,14 +36,15 @@ const addWord = async ( uuid: string, word: string ) => {
 };
 
 const Words: React.FC<Props> = ( { gameUuid } ) => {
-    const { data, error } = useSWR<IWord[]>( `/api/game/${gameUuid}/words` );
+    const { data, error, mutate } = useSWR<IWord[]>( `/api/game/${gameUuid}/words` );
     const [newWord, setNewWord] = useState('');
 
     if ( error ) return <div>failed to load</div>;
     if ( !data ) return <div>loading...</div>;
 
     const handleAdd = () => {
-        addWord(gameUuid, newWord);
+        addWord(gameUuid, newWord)
+            .then(() => mutate());
         setNewWord('');
     };
 

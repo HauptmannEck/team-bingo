@@ -3,7 +3,7 @@ import {
     Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
     TextField,
 } from '@material-ui/core';
-import {IGame} from '../../utils/interfaces';
+import type {IGame} from '../../utils/interfaces';
 import {useRouter} from 'next/router';
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const createBoard = async (uuid: string, name: string, email: string) => {
-    const res = await fetch(`/api/game/${uuid}`, {
+    const res = await fetch(`/api/game/${uuid}/board`, {
         body: JSON.stringify({
             name,
             email,
@@ -19,10 +19,10 @@ const createBoard = async (uuid: string, name: string, email: string) => {
         headers: {
             'Content-Type': 'application/json',
         },
-        method: 'PUT',
+        method: 'POST',
     });
 
-    if (res.status == 204) {
+    if (res.status == 201) {
         return await res.json();
     } else {
         throw Error(await res.text());
