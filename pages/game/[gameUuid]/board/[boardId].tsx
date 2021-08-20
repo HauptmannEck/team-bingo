@@ -49,7 +49,7 @@ const SelectedSVG = () => (
 
 const Cell: React.FC<ICellProps> = ( { wordId, word = '', selected = false, onClick } ) => (
     <div className={`${styles.cell} ${selected ? styles.active : ''} ${wordId === -1 ? styles.free : ''}`} onClick={onClick}>
-        <Typography variant="h6" className={styles.text}>{word}</Typography>
+        <div className={styles.text}>{word}</div>
         <div className={styles.check}><SelectedSVG/></div>
     </div>
 );
