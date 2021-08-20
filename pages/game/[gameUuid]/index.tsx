@@ -1,34 +1,21 @@
 import React from 'react';
-import Layout from '../../components/layout';
+import Layout from '../../../components/layout';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
-import { getAllGameUuids, getGame } from '../../utils/db';
-import { IGame } from '../../utils/interfaces';
-import { Button, Typography } from '@material-ui/core';
+import { getAllGameUuids, getGame } from '../../../utils/db';
+import type { IGame } from '../../../utils/interfaces';
+import { Typography } from '@material-ui/core';
 import { useRouter } from 'next/router';
-import utilStyles from '../../styles/utilStyles.module.scss';
-import styles from './index.module.scss';
-import Words from '../../components/words';
+import utilStyles from '../../../styles/utilStyles.module.scss';
+import styles from '../index.module.scss';
+import Words from '../../../components/words';
 import ErrorPage from 'next/error';
+import EditGame from '../../../components/editGame';
+import CreateBoard from '../../../components/createBoard';
 
 interface Props {
     gameData: IGame | null;
 }
-
-const deleteGame = async ( uuid: string ) => {
-    const res = await fetch( `/api/game/${uuid}`, {
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        method: 'DELETE',
-    } );
-
-    if ( res.status == 204 ) {
-        return;
-    } else {
-        throw Error( await res.text() );
-    }
-};
 
 const Game: React.FC<Props> = ( { gameData } ) => {
     const router = useRouter();
@@ -39,11 +26,6 @@ const Game: React.FC<Props> = ( { gameData } ) => {
         return <ErrorPage statusCode={404}/>;
     }
 
-    const handleDelete = () => {
-        deleteGame( gameData.uuid )
-            .then( () => router.push( '/' ) );
-    };
-
     return (
         <Layout
             toolbar={(
@@ -51,13 +33,7 @@ const Game: React.FC<Props> = ( { gameData } ) => {
                     <Typography variant="h6" color="inherit" className={utilStyles.appBarTitle}>
                         {gameData.name}
                     </Typography>
-                    <Button
-                        variant="contained"
-                        onClick={handleDelete}
-                        color="secondary"
-                    >
-                        Delete Game
-                    </Button>
+                    <EditGame game={gameData}/>
                 </>
             )}
         >
@@ -66,7 +42,8 @@ const Game: React.FC<Props> = ( { gameData } ) => {
             </Head>
             <div className={styles.main}>
                 <div className={styles.details}>
-                    <p>ID: {gameData.id}</p>
+                    <p>{gameData.desc ?? ''}</p>
+                    <CreateBoard game={gameData}/>
                 </div>
                 <div className={styles.words}>
                     <Words gameUuid={gameData.uuid} />
@@ -81,14 +58,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
     return {
         paths: uuids.map( item => ({
             params: {
-                id: item,
+                gameUuid: item,
             },
         }) ),
         fallback: true,
     };
 };
 
-export const getStaticProps: GetStaticProps<any, { id: string }> = async ( { params } ) => {
+export const getStaticProps: GetStaticProps<any, { gameUuid: string }> = async ( { params } ) => {
     if ( !params ) {
         return {
             props: {
@@ -96,7 +73,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ( { par
             },
         };
     }
-    const gameData = await getGame( params.id );
+    const gameData = await getGame( params.gameUuid );
     return {
         props: {
             gameData,
