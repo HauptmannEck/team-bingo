@@ -33,6 +33,7 @@
     "eslint-config-next": "11.1.0",
     "husky": "^7.0.1",
     "planetscale-node": "^0.1.0",
-    "start-server-and-test": "^1.13.1"
+    "start-server-and-test": "^1.13.1",
+    "typescript": "^4.3.5"
   }
 }
