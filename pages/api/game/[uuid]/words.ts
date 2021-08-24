@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createGameWord, deleteGame, getGameWords } from '../../../../utils/db';
+import {createGameWord, getGameWords, verifyAdminKey} from '../../../../utils/db';
 
 const handler = async ( req: NextApiRequest, res: NextApiResponse ) => {
     if ( req.method === 'GET' ) {
@@ -12,10 +12,16 @@ const handler = async ( req: NextApiRequest, res: NextApiResponse ) => {
     } else if ( req.method === 'POST' ) {
         const { uuid } = req.query;
         const { text } = req.body;
+        const key = req.headers['admin-key'] as string;
 
-        const success = await createGameWord( uuid as string, text );
+        const matches = await verifyAdminKey( uuid as string, key );
 
-        return res.status( success ? 204 : 400 ).end();
+        if(matches){
+            const success = await createGameWord( uuid as string, text );
+            return res.status( success ? 204 : 400 ).end();
+        }
+
+        return res.status( 401 ).end();
     }
 
     return res.status( 404 ).end();

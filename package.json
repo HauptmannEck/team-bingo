@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@material-ui/icons": "^4.11.2",
@@ -24,6 +25,7 @@
     "@types/uuid": "^8.3.1",
     "eslint": "7.32.0",
     "eslint-config-next": "11.1.0",
+    "husky": "^7.0.1",
     "planetscale-node": "^0.1.0"
   }
 }

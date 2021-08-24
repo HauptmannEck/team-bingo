@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import styles from '../index.module.scss';
 import Layout from '../../components/layout';
-import { Button, TextField } from '@material-ui/core';
+import {Button, TextField, Typography} from '@material-ui/core';
 import { useRouter } from 'next/router';
 
 const sendNewGame = async ( name: string, adminCode: string ) => {
@@ -27,6 +26,7 @@ const Home: React.FC = () => {
     const router = useRouter();
     const [name, setName] = useState( '' );
     const [adminCode, setAdminCode] = useState( '' );
+    const [passKey, setPassKey] = useState( '' );
 
     const handleCreate = () => {
         sendNewGame( name, adminCode )
@@ -35,27 +35,41 @@ const Home: React.FC = () => {
 
     return (
         <Layout>
-            <main className={styles.main}>
-                <h1 className={styles.title}>
+            <main>
+                <Typography variant="h2" component="h1">
                     Create a new Game
-                </h1>
+                </Typography>
 
-                <p className={styles.description}>
+                <Typography variant="subtitle1">
                     Select the name of the new game and the admin code. Do not share your admin code as that gives full
                     control of the game.
-                </p>
+                </Typography>
 
                 <TextField
                     value={name}
                     label="Name"
                     onChange={( event ) => setName( event.target.value )}
+                    fullWidth
                 />
                 <TextField
                     value={adminCode}
                     label="Admin Code"
                     onChange={( event ) => setAdminCode( event.target.value )}
+                    helperText="Keep this secure as this is required to edit the game"
+                    fullWidth
                 />
+                <TextField
+                    value={passKey}
+                    label="Access Key (optional)"
+                    onChange={( event ) => setPassKey( event.target.value )}
+                    helperText="If you set an Access Key, all users will need it to view the game and create new boards."
+                    fullWidth
+                />
+
                 <Button
+                    style={{marginTop: 10}}
+                    variant="contained"
+                    color="primary"
                     disabled={!name || !adminCode}
                     onClick={handleCreate}
                 >
