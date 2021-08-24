@@ -18,3 +18,14 @@ jobs:
           build: npm run build
           wait-on: 'http://localhost:3000'
           start: npm start
+        env:
+          PLANETSCALE_DB_HOST: ${{secrets.PLANETSCALE_DB_HOST}}
+          PLANETSCALE_DB_PASSWORD: ${{secrets.PLANETSCALE_DB_PASSWORD}}
+          PLANETSCALE_DB_USERNAME: ${{secrets.PLANETSCALE_DB_USERNAME}}
+          PLANETSCALE_DB: ${{secrets.PLANETSCALE_DB}}
+          PLANETSCALE_ORG: ${{secrets.PLANETSCALE_ORG}}
+          PLANETSCALE_TOKEN: ${{secrets.PLANETSCALE_TOKEN}}
+          PLANETSCALE_TOKEN_NAME: ${{secrets.PLANETSCALE_TOKEN_NAME}}
+          LOGTAIL_SOURCE_TOKEN: ${{secrets.LOGTAIL_SOURCE_TOKEN}}
+          NEXT_PUBLIC_LOGTAIL_SOURCE_TOKEN: ${{secrets.NEXT_PUBLIC_LOGTAIL_SOURCE_TOKEN}}
+          SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
