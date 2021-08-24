@@ -1,13 +1,18 @@
 import {PSDB} from 'planetscale-node';
 import {v4} from 'uuid';
-import type { IBoard, ICell, IDBCell, IGame, IWord } from './interfaces';
+import type {IBoard, ICell, IDBCell, IGame, IWord} from './interfaces';
 
 const conn = new PSDB(process.env.NODE_ENV === 'development' ? 'develop' : 'main');
 
 export const getRandomGames = async () => {
     try {
-        const [row] = await conn.query('select id, uuid, name from games order by rand()', undefined); // limit 6
-        return row.map((item: any) => ({...item})) ?? [];
+        const [row] = await conn.query('select id, uuid, name, pass_key from games order by rand()', undefined); // limit 6
+        return row.map((item: any) => ({
+            id: item.id,
+            uuid: item.uuid,
+            name: item.name,
+            passKey: !!row[0].pass_key,
+        })) ?? [];
     } catch (e) {
         return [];
     }
@@ -39,11 +44,11 @@ export const createGame = async (name: string, adminCode: string): Promise<strin
 };
 
 export const editGame = async (uuid: string, game: Partial<IGame>): Promise<boolean> => {
-    await conn.query('update games set name=?, description=? where uuid=?', [game.name, game.desc, uuid]);
+    await conn.query('update games set name=?, description=?, pass_key=? where uuid=?', [game.name, game.desc, game.passKey ?? null, uuid]);
     return true;
 };
 
-export const editBoard = async (gameUuid: string, boardId:number, name: string, cells: string): Promise<boolean> => {
+export const editBoard = async (gameUuid: string, boardId: number, name: string, cells: string): Promise<boolean> => {
     await conn.query('update boards set name=?, cells=? where game_uuid=? and id=?', [name, cells, gameUuid, boardId]);
     return true;
 };
@@ -92,17 +97,48 @@ export const getGame = async (uuid: string): Promise<IGame | null> => {
     }
 };
 
+export const getGamePassKey = async (uuid: string): Promise<string | null> => {
+    try {
+        const [row] = await conn.query(`select pass_key from games where uuid='${uuid}'`, undefined);
+        if (row.length > 0) {
+            return row[0].pass_key;
+        } else {
+            return null;
+        }
+    } catch (e) {
+        return null;
+    }
+};
+
+export const verifyKey = async (uuid: string, key: string): Promise<boolean> => {
+    const [row] = await conn.query(`select pass_key from games where uuid='${uuid}'`, undefined);
+    if (row.length > 0) {
+        return row[0].pass_key === key;
+    } else {
+        return false;
+    }
+};
+
+export const verifyAdminKey = async (uuid: string, key: string): Promise<boolean> => {
+    const [row] = await conn.query(`select admin_key from games where uuid='${uuid}'`, undefined);
+    if (row.length > 0) {
+        return row[0].admin_key === key;
+    } else {
+        return false;
+    }
+};
+
 export const getBoard = async (uuid: string, id: number): Promise<IBoard | null> => {
     try {
         const [row] = await conn.query('select id, name, cells from boards where game_uuid=? and id=?', [uuid, id]);
         if (row.length > 0) {
             const dbCells: IDBCell[] = row[0].cells;
             let cells: ICell[] = [];
-            if(dbCells.length > 0){
-                const [words] = await conn.query('select id, text from game_words where id in (?)', [dbCells.map( item => item.id)]);
+            if (dbCells.length > 0) {
+                const [words] = await conn.query('select id, text from game_words where id in (?)', [dbCells.map(item => item.id)]);
                 cells = dbCells.map(cell => {
                     const word = ((words as IWord[]) ?? []).find(word => word.id === cell.id);
-                    if(word){
+                    if (word) {
                         return {
                             wordId: cell.id,
                             word: word?.text ?? '',
@@ -133,12 +169,12 @@ export const clearGamesBoards = async (): Promise<void> => {
         const [oldBoards] = await conn.query('select id from boards where updated_at < now() - interval 30 DAY', []);
         const [oldGames] = await conn.query('select uuid from games where updated_at < now() - interval 30 DAY', []);
         if (oldBoards.length > 0) {
-            await conn.query('delete from boards where id in (?)', [oldBoards.map(( board: { id: any; }) => board.id)]);
+            await conn.query('delete from boards where id in (?)', [oldBoards.map((board: { id: any; }) => board.id)]);
         }
-        if (oldGames.length > 0){
-            for(const game of oldGames) {
+        if (oldGames.length > 0) {
+            for (const game of oldGames) {
                 const [boards] = await conn.query('select COUNT(*) from boards where game_uuid=?', [game.uuid]);
-                if(boards.length === 1 && boards[0]['COUNT(*)'] === 0){
+                if (boards.length === 1 && boards[0]['COUNT(*)'] === 0) {
                     await conn.query('delete from game_words where uuid=?', [game.uuid]);
                     await conn.query('delete from games where uuid=?', [game.uuid]);
                 }

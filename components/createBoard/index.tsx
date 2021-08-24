@@ -10,11 +10,12 @@ interface Props {
     game: IGame;
 }
 
-const createBoard = async (uuid: string, name: string, email: string) => {
+const createBoard = async (uuid: string, gameName: string, name: string, email: string) => {
     const res = await fetch(`/api/game/${uuid}/board`, {
         body: JSON.stringify({
             name,
             email,
+            gameName,
         }),
         headers: {
             'Content-Type': 'application/json',
@@ -40,7 +41,7 @@ const CreateBoard: React.FC<Props> = ({game}) => {
     };
 
     const handleSave = () => {
-        createBoard(game.uuid, name, email)
+        createBoard(game.uuid, game.name, name, email)
             .then(({id}) => router.push(`/game/${game.uuid}/board/${id}`));
     };
 

@@ -6,6 +6,7 @@ import type {IGame} from '../utils/interfaces';
 import {GetStaticProps} from 'next';
 import {getRandomGames} from '../utils/db';
 import {Button} from '@material-ui/core';
+import {Lock} from '@material-ui/icons';
 
 interface IProps {
     randomGames: IGame[];
@@ -23,7 +24,7 @@ const Home: React.FC<IProps> = ({randomGames}) => {
                     Host and play a custom game of bingo with your team
                 </p>
 
-                <Link href={'/game'}>
+                <Link href={'/game'} passHref>
                     <Button
                         variant="contained"
                         color="primary"
@@ -37,6 +38,9 @@ const Home: React.FC<IProps> = ({randomGames}) => {
                         <Link key={game.id} href={`/game/${game.uuid}`} passHref>
                             <a className={styles.card}>
                                 <h2>{game.name}</h2>
+                                {game.passKey && (
+                                    <Lock/>
+                                )}
                             </a>
                         </Link>
                     ))}

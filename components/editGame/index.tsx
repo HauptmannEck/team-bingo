@@ -1,41 +1,66 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
     Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
     TextField,
 } from '@material-ui/core';
 import type {IGame} from '../../utils/interfaces';
 import {useRouter} from 'next/router';
+import adminContext from './../adminCheck/adminContext';
 
 interface Props {
     game: IGame;
 }
 
-const deleteGame = async (uuid: string) => {
+const deleteGame = async (uuid: string, key: string) => {
     const res = await fetch(`/api/game/${uuid}`, {
         headers: {
             'Content-Type': 'application/json',
+            'admin-key': key,
         },
         method: 'DELETE',
     });
 
-    if (res.status == 204) {
+    if (res.ok) {
         return;
     } else {
         throw Error(await res.text());
     }
 };
 
-const editGame = async (uuid: string, updates: Partial<IGame>) => {
+interface IEdit {
+    name: string;
+    desc: string | null;
+    passKey: string | null;
+}
+
+const editGame = async (uuid: string, key: string, updates: Partial<IEdit>) => {
     const res = await fetch(`/api/game/${uuid}`, {
         body: JSON.stringify(updates),
         headers: {
             'Content-Type': 'application/json',
+            'admin-key': key,
         },
         method: 'PUT',
     });
 
-    if (res.status == 204) {
+    if (res.ok) {
         return;
+    } else {
+        throw Error(await res.text());
+    }
+};
+
+const getKey = async (uuid: string, adminKey: string): Promise<{passKey: string | null}> => {
+    const res = await fetch(`/api/game/${uuid}/pass-key`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'admin-key': adminKey,
+        },
+        method: 'GET',
+    });
+
+    if (res.ok) {
+        return await res.json();
     } else {
         throw Error(await res.text());
     }
@@ -43,23 +68,38 @@ const editGame = async (uuid: string, updates: Partial<IGame>) => {
 
 const EditGame: React.FC<Props> = ({game}) => {
     const router = useRouter();
+    const admin = useContext(adminContext);
     const [open, setOpen] = useState(false);
     const [name, setName] = useState(game.name);
     const [desc, setDesc] = useState(game.desc);
+    const [passKey, setPassKey] = useState<string | null>( null );
+
+    useEffect(() => {
+        if(!admin || !open){
+            return;
+        }
+        getKey(game.uuid, admin)
+            .then(json => setPassKey(json.passKey ?? ''));
+    }, [open, game.uuid, admin]);
+
+    if(!admin){
+        return null;
+    }
 
     const handleClose = () => {
         setOpen(false);
     };
 
     const handleDelete = () => {
-        deleteGame(game.uuid)
+        deleteGame(game.uuid, admin)
             .then(() => router.push('/'));
     };
 
     const handleSave = () => {
-        editGame(game.uuid, {
+        editGame(game.uuid, admin,{
             name,
-            desc,
+            desc: desc?.trim() || null,
+            passKey: passKey?.trim() || null,
         }).then(() => setOpen(false));
     };
 
@@ -91,6 +131,16 @@ const EditGame: React.FC<Props> = ({game}) => {
                         value={desc}
                         onChange={event => setDesc(event.target.value)}
                         fullWidth
+                    />
+                    <TextField
+                        margin="dense"
+                        id="pass"
+                        label="Access Key (optional)"
+                        value={passKey ?? ''}
+                        onChange={event => setPassKey(event.target.value)}
+                        fullWidth
+                        disabled={passKey === null}
+                        helperText="If you set an Access Key, all users will need it to view the game and create new boards."
                     />
                 </DialogContent>
                 <DialogActions>
