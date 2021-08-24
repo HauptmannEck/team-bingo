@@ -3,6 +3,7 @@ import { createBoard, getGameWords } from '../../../../../utils/db';
 import { sendEmail } from '../../../../../utils/email';
 import { sampleSize } from '../../../../../utils/helpers';
 import type { IDBCell } from '../../../../../utils/interfaces';
+import {errorHandler} from '../../../../../utils/logServer';
 
 const emailTemplate = (gameName: string, boardName: string, link: string) => `
 <p><b>Game: ${gameName}</b></p>
@@ -40,4 +41,4 @@ const handler = async ( req: NextApiRequest, res: NextApiResponse ) => {
     return res.status( 404 ).end();
 };
 
-export default handler;
+export default errorHandler(handler);

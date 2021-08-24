@@ -1,5 +1,6 @@
 import mail from '@sendgrid/mail';
 import { MailContent } from '@sendgrid/helpers/classes/mail';
+import serverLogger from './logServer';
 
 if ( process.env.SENDGRID_API_KEY ) {
     mail.setApiKey( process.env.SENDGRID_API_KEY );
@@ -21,6 +22,7 @@ export const sendEmail = async ( to: string, subject: string, content: Content )
         } )
         .catch( ( error ) => {
             console.error( error );
+            serverLogger.error( error );
         } );
 };
 

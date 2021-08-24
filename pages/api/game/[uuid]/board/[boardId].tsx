@@ -1,15 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import {NextApiRequest, NextApiResponse} from 'next';
-import { deleteGame, editBoard, editGame, getBoard } from '../../../../../utils/db';
+import type {NextApiRequest, NextApiResponse} from 'next';
+import { editBoard, getBoard } from '../../../../../utils/db';
+import {errorHandler} from '../../../../../utils/logServer';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    if (req.method === 'DELETE') {
-        const {uuid, boardId} = req.query;
-
-        const success = await deleteGame(uuid as string);
-
-        return res.status(success ? 204 : 400).end();
-    } else if (req.method === 'PUT') {
+    if (req.method === 'PUT') {
         const {uuid, boardId} = req.query;
         const {name, cells} = req.body;
 
@@ -27,4 +22,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(404).end();
 };
 
-export default handler;
+export default errorHandler(handler);

@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import {NextApiRequest, NextApiResponse} from 'next';
 import {deleteGame, editGame, verifyAdminKey} from '../../../../utils/db';
+import {errorHandler} from '../../../../utils/logServer';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'DELETE') {
@@ -34,4 +35,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(404).end();
 };
 
-export default handler;
+export default errorHandler(handler);

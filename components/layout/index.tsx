@@ -9,6 +9,7 @@ import {
 import HomeIcon from '@material-ui/icons/Home';
 import {useRouter} from 'next/router';
 import styles from './index.module.scss';
+import ErrorBoundary from '../errorBoundary';
 
 interface Props {
     toolbar?: JSX.Element;
@@ -18,6 +19,7 @@ const Layout: React.FC<Props> = ({children, toolbar}) => {
     const router = useRouter();
 
     return (
+        <ErrorBoundary>
             <Container className={styles.container}>
                 <AppBar>
                     <Toolbar variant="dense">
@@ -33,6 +35,7 @@ const Layout: React.FC<Props> = ({children, toolbar}) => {
                 </main>
                 <footer>From <Link href="https://github.com/HauptmannEck/team-bingo">Happy Bandit</Link> {(new Date()).getFullYear()}</footer>
             </Container>
+        </ErrorBoundary>
     );
 };
 

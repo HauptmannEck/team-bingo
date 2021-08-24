@@ -3,6 +3,7 @@ import {
     getGamePassKey,
     verifyAdminKey,
 } from '../../../../utils/db';
+import {errorHandler} from '../../../../utils/logServer';
 
 const handler = async ( req: NextApiRequest, res: NextApiResponse ) => {
     if ( req.method === 'GET' ) {
@@ -23,4 +24,4 @@ const handler = async ( req: NextApiRequest, res: NextApiResponse ) => {
     return res.status( 404 ).end();
 };
 
-export default handler;
+export default errorHandler(handler);
