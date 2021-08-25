@@ -2,7 +2,7 @@ import {PSDB} from 'planetscale-node';
 import {v4} from 'uuid';
 import type {IBoard, ICell, IDBCell, IGame, IWord} from './interfaces';
 
-const conn = new PSDB(process.env.NODE_ENV === 'development' ? 'develop' : 'main');
+const conn = new PSDB(process.env.PLANETSCALE_BRANCH || 'develop');
 
 export const getRandomGames = async () => {
     try {
