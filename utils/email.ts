@@ -22,7 +22,9 @@ export const sendEmail = async ( to: string, subject: string, content: Content )
         } )
         .catch( ( error ) => {
             console.error( error );
-            serverLogger.error( error );
+            if(serverLogger) {
+                serverLogger.error( error );
+            }
         } );
 };
 
